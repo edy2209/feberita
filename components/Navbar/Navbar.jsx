@@ -75,13 +75,26 @@ export default function Navbar({ kategoris = [] }) {
                         <span className="text-sm font-semibold text-[#8888aa] ml-0.5">Sumbar</span>
                     </Link>
 
-                    {/* Spacer */}
-                    <div className="flex-1" />
+                    {/* Search bar - desktop only */}
+                    <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-lg bg-[#16161f] border border-[#2a2a3a] rounded-full overflow-hidden transition-all focus-within:border-[#e63946] focus-within:shadow-[0_0_0_3px_rgba(230,57,70,0.15)]">
+                        <input
+                            type="text"
+                            placeholder="Cari berita..."
+                            value={searchVal}
+                            onChange={(e) => setSearchVal(e.target.value)}
+                            className="flex-1 bg-transparent border-none outline-none px-5 py-2.5 text-sm text-white placeholder-[#555570] font-[Inter]"
+                        />
+                        <button type="submit" className="bg-[#e63946] border-none text-white px-4 py-2.5 cursor-pointer hover:bg-[#c1121f] transition-colors flex items-center shrink-0">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                            </svg>
+                        </button>
+                    </form>
 
-                    {/* Search Icon Button — semua ukuran layar */}
+                    {/* Mobile Search Icon Button — mobile only */}
                     <button
                         onClick={() => setSearchOpen(true)}
-                        className="flex items-center justify-center w-9 h-9 rounded-full bg-[#16161f] border border-[#2a2a3a] text-[#8888aa] hover:text-white hover:border-[#e63946] hover:bg-[rgba(230,57,70,0.1)] transition-all cursor-pointer shrink-0"
+                        className="md:hidden flex items-center justify-center w-9 h-9 rounded-full bg-[#16161f] border border-[#2a2a3a] text-[#8888aa] hover:text-white hover:border-[#e63946] hover:bg-[rgba(230,57,70,0.1)] transition-all cursor-pointer shrink-0"
                         aria-label="Cari berita"
                     >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
