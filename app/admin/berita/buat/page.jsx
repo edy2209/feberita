@@ -135,6 +135,7 @@ export default function CreateBeritaPage() {
                             <RichTextEditor
                                 value={content}
                                 onChange={(val) => setContent(val)}
+                                token={token}
                             />
                         </div>
                     </div>

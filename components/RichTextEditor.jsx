@@ -7,6 +7,7 @@ import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextAlign from '@tiptap/extension-text-align';
 import { useState } from 'react';
+import { uploadImage } from '@/lib/api';
 
 // ============================================================
 // Custom Extension: PageBreak
@@ -80,9 +81,10 @@ const ToolbarButton = ({ onClick, active, title, children }) => (
 // ============================================================
 // Komponen Utama RichTextEditor
 // ============================================================
-export default function RichTextEditor({ value, onChange }) {
+export default function RichTextEditor({ value, onChange, token }) {
     const [imageUrl, setImageUrl] = useState('');
     const [showImgModal, setShowImgModal] = useState(false);
+    const [uploadingLocal, setUploadingLocal] = useState(false);
     const [linkUrl, setLinkUrl] = useState('');
     const [showLinkModal, setShowLinkModal] = useState(false);
 
@@ -95,10 +97,8 @@ export default function RichTextEditor({ value, onChange }) {
             TextAlign.configure({ types: ['heading', 'paragraph', 'image'] }),
             PageBreak,
         ],
-        // Pre-process: konversi <!--nextpage--> agar TipTap bisa membacanya
         content: prepareContentForEditor(value),
         onUpdate: ({ editor }) => {
-            // Post-process: konversi kembali sebelum disimpan
             const rawHtml = editor.getHTML();
             onChange(prepareHtmlForSave(rawHtml));
         },
@@ -106,6 +106,69 @@ export default function RichTextEditor({ value, onChange }) {
             attributes: {
                 class: 'tiptap-editor-content outline-none min-h-[400px] p-4 text-[#f0f0f5] leading-relaxed',
             },
+            handleDOMEvents: {
+                paste(view, event) {
+                    const items = (event.clipboardData || event.originalEvent.clipboardData)?.items;
+                    if (!items) return false;
+                    
+                    let hasImage = false;
+                    for (const item of items) {
+                        if (item.type.indexOf('image') === 0) {
+                            hasImage = true;
+                            const file = item.getAsFile();
+                            if (file && token) {
+                                event.preventDefault();
+                                uploadImage(token, file).then(res => {
+                                    if (res.status === 'success' && res.url) {
+                                        // Sisipkan gambar yang sudah di-upload ke editor
+                                        view.dispatch(view.state.tr.replaceSelectionWith(
+                                            view.state.schema.nodes.image.create({ src: res.url })
+                                        ));
+                                    } else {
+                                        alert(res.message || 'Gagal mengunggah gambar otomatis saat paste.');
+                                    }
+                                }).catch(err => {
+                                    console.error(err);
+                                    alert('Kesalahan koneksi saat mengunggah gambar otomatis.');
+                                });
+                            }
+                        }
+                    }
+                    return hasImage;
+                },
+                drop(view, event) {
+                    const files = event.dataTransfer?.files;
+                    if (!files || files.length === 0) return false;
+                    
+                    let hasImage = false;
+                    for (const file of files) {
+                        if (file.type.indexOf('image') === 0) {
+                            hasImage = true;
+                            if (token) {
+                                event.preventDefault();
+                                uploadImage(token, file).then(res => {
+                                    if (res.status === 'success' && res.url) {
+                                        const { schema } = view.state;
+                                        const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
+                                        if (coordinates) {
+                                            view.dispatch(view.state.tr.insert(
+                                                coordinates.pos,
+                                                schema.nodes.image.create({ src: res.url })
+                                            ));
+                                        }
+                                    } else {
+                                        alert(res.message || 'Gagal mengunggah gambar saat drop.');
+                                    }
+                                }).catch(err => {
+                                    console.error(err);
+                                    alert('Kesalahan koneksi saat mengunggah gambar.');
+                                });
+                            }
+                        }
+                    }
+                    return hasImage;
+                }
+            }
         },
     });
 
@@ -173,8 +236,8 @@ export default function RichTextEditor({ value, onChange }) {
 
                 <div className="w-px h-7 bg-[#2a2a3a] mx-1 self-center" />
 
-                {/* Image via URL */}
-                <ToolbarButton onClick={() => setShowImgModal(true)} active={false} title="Sisipkan Foto via URL">
+                {/* Image via URL / Direct Upload */}
+                <ToolbarButton onClick={() => setShowImgModal(true)} active={false} title="Sisipkan Foto (Upload / URL)">
                     🖼 Foto
                 </ToolbarButton>
 
@@ -206,20 +269,68 @@ export default function RichTextEditor({ value, onChange }) {
             {showImgModal && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowImgModal(false)}>
                     <div className="bg-[#16161f] border border-[#2a2a3a] rounded-xl p-6 w-full max-w-md mx-4" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-white font-bold mb-1">Sisipkan Foto ke Konten</h3>
-                        <p className="text-xs text-[#8888aa] mb-4">Masukkan URL/link gambar dari internet (Unsplash, imgbb, dll)</p>
-                        <input
-                            type="url"
-                            placeholder="https://example.com/foto.jpg"
-                            value={imageUrl}
-                            onChange={(e) => setImageUrl(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && insertImage()}
-                            className="w-full bg-[#0a0a0f] border border-[#2a2a3a] rounded-lg px-4 py-2.5 text-sm text-white placeholder-[#555570] outline-none focus:border-[#e63946] mb-4"
-                            autoFocus
-                        />
-                        <div className="flex gap-2 justify-end">
-                            <button onClick={() => setShowImgModal(false)} className="px-4 py-2 rounded-lg text-sm text-[#8888aa] hover:bg-[#2a2a3a] transition-colors">Batal</button>
-                            <button onClick={insertImage} className="px-4 py-2 rounded-lg text-sm bg-[#e63946] text-white hover:bg-[#c1121f] transition-colors">Sisipkan</button>
+                        <h3 className="text-white font-bold mb-1 text-base">Sisipkan Foto ke Konten</h3>
+                        <p className="text-xs text-[#8888aa] mb-4">Pilih upload file langsung dari komputer Anda atau masukkan link URL.</p>
+                        
+                        {/* Pilihan 1: Upload dari Komputer */}
+                        <div className="mb-4 mt-2">
+                            <label className="text-[10px] font-bold text-[#8888aa] tracking-wider block mb-1.5 uppercase">Pilihan 1: Upload dari Komputer</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    if (!token) {
+                                        alert('Token tidak valid. Silakan login kembali.');
+                                        return;
+                                    }
+                                    setUploadingLocal(true);
+                                    try {
+                                        const res = await uploadImage(token, file);
+                                        if (res.status === 'success' && res.url) {
+                                            setImageUrl(res.url);
+                                        } else {
+                                            alert(res.message || 'Gagal mengunggah foto.');
+                                        }
+                                    } catch (err) {
+                                        alert('Kesalahan koneksi saat mengunggah foto.');
+                                    } finally {
+                                        setUploadingLocal(false);
+                                    }
+                                }}
+                                className="w-full bg-[#0a0a0f] border border-[#2a2a3a] rounded-lg px-3 py-2 text-xs text-[#8888aa] focus:outline-none file:mr-3 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#2a2a3a] file:text-white hover:file:bg-[#3d3d52]"
+                                disabled={uploadingLocal}
+                            />
+                            {uploadingLocal && (
+                                <p className="text-[10px] text-[#e63946] mt-1.5 animate-pulse">⏳ Mengunggah foto ke server...</p>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-3 my-4">
+                            <div className="flex-grow h-px bg-[#2a2a3a]"></div>
+                            <span className="text-[9px] text-[#555570] font-black uppercase">Atau</span>
+                            <div className="flex-grow h-px bg-[#2a2a3a]"></div>
+                        </div>
+
+                        {/* Pilihan 2: URL Internet */}
+                        <div className="mb-4">
+                            <label className="text-[10px] font-bold text-[#8888aa] tracking-wider block mb-1.5 uppercase">Pilihan 2: Masukkan URL Gambar</label>
+                            <input
+                                type="url"
+                                placeholder="https://example.com/foto.jpg"
+                                value={imageUrl}
+                                onChange={(e) => setImageUrl(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && insertImage()}
+                                className="w-full bg-[#0a0a0f] border border-[#2a2a3a] rounded-lg px-4 py-2.5 text-sm text-white placeholder-[#555570] outline-none focus:border-[#e63946]"
+                                disabled={uploadingLocal}
+                                autoFocus
+                            />
+                        </div>
+
+                        <div className="flex gap-2 justify-end mt-6">
+                            <button onClick={() => setShowImgModal(false)} className="px-4 py-2 rounded-lg text-sm text-[#8888aa] hover:bg-[#2a2a3a] transition-colors" disabled={uploadingLocal}>Batal</button>
+                            <button onClick={insertImage} className="px-4 py-2 rounded-lg text-sm bg-[#e63946] text-white hover:bg-[#c1121f] transition-colors" disabled={uploadingLocal || !imageUrl}>Sisipkan</button>
                         </div>
                     </div>
                 </div>
@@ -236,7 +347,7 @@ export default function RichTextEditor({ value, onChange }) {
                             value={linkUrl}
                             onChange={(e) => setLinkUrl(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && insertLink()}
-                            className="w-full bg-[#0a0a0f] border border-[#2a2a3a] rounded-lg px-4 py-2.5 text-sm text-white placeholder-[#555570] outline-none focus:border-[#e63946] mb-4"
+                            className="w-full bg-[#0a0a0f] border border-[#2a2a3a] rounded-lg px-4 py-2.5 text-sm text-white placeholder-[#555570] outline-none focus:border-[#e63946]"
                             autoFocus
                         />
                         <div className="flex gap-2 justify-end">
