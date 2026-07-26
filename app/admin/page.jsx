@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
@@ -21,17 +21,25 @@ export default function AdminDashboardPage() {
     const [page, setPage] = useState(1);
     const [meta, setMeta] = useState({ page: 1, totalPages: 1, limit: 10, total: 0 });
     const [activeTab, setActiveTab] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState('');
+    const debounceRef = useRef(null);
 
     useEffect(() => {
         if (!token) { router.push('/admin/login'); return; }
         loadData();
-    }, [page, token, activeTab]);
+    }, [page, token, activeTab, searchQuery]);
 
     const loadData = async () => {
         if (!token) return;
         setLoading(true);
         try {
-            const newsRes = await getBeritaAdmin(token, { page, limit: 10, status: activeTab });
+            const newsRes = await getBeritaAdmin(token, {
+                page,
+                limit: 10,
+                status: activeTab,
+                search: searchQuery,
+            });
             setBeritas(newsRes.data || []);
             setMeta(newsRes.meta || { page: 1, totalPages: 1, limit: 10, total: 0 });
         } catch (err) {
@@ -43,6 +51,22 @@ export default function AdminDashboardPage() {
 
     const handleTabChange = (tabValue) => {
         setActiveTab(tabValue);
+        setPage(1);
+    };
+
+    // Debounce pencarian agar tidak spam request tiap ketukan
+    const handleSearchInput = (val) => {
+        setSearchInput(val);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            setSearchQuery(val);
+            setPage(1);
+        }, 500);
+    };
+
+    const clearSearch = () => {
+        setSearchInput('');
+        setSearchQuery('');
         setPage(1);
     };
 
@@ -77,42 +101,78 @@ export default function AdminDashboardPage() {
     if (!token) return null;
 
     return (
-        <main className="flex-grow p-8">
+        <main className="flex-grow p-6 md:p-8">
             {/* Page Header */}
-            <div className="flex items-center justify-between mb-6 border-b border-[#2a2a3a] pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 border-b border-[#2a2a3a] pb-4 gap-3">
                 <div>
                     <h1 className="text-2xl font-extrabold text-white flex items-center gap-3">
                         <span className="text-[#e63946]">📰</span> Manajemen Berita
                     </h1>
-                    <p className="text-sm text-[#8888aa] mt-1">Total {meta.total} artikel tersimpan di database</p>
+                    <p className="text-sm text-[#8888aa] mt-1">
+                        {searchQuery
+                            ? `${meta.total} hasil pencarian untuk "${searchQuery}"`
+                            : `Total ${meta.total} artikel tersimpan di database`}
+                    </p>
                 </div>
-                <Link href="/admin/berita/buat" className="btn btn-primary rounded-lg">
+                <Link href="/admin/berita/buat" className="btn btn-primary rounded-lg shrink-0">
                     + Tulis Berita Baru
                 </Link>
             </div>
 
-            {/* Status Filter Tabs */}
-            <div className="flex gap-1 mb-5 bg-[#111118] p-1 rounded-xl border border-[#2a2a3a] w-fit">
-                {STATUS_TABS.map((tab) => (
-                    <button
-                        key={tab.value}
-                        onClick={() => handleTabChange(tab.value)}
-                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all border-none cursor-pointer ${
-                            activeTab === tab.value
-                                ? 'bg-[#e63946] text-white shadow-md'
-                                : 'text-[#8888aa] bg-transparent hover:text-white hover:bg-[#1e1e2a]'
-                        }`}
+            {/* Filter & Search Row */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-5 items-start sm:items-center">
+                {/* Status Filter Tabs */}
+                <div className="flex gap-1 bg-[#111118] p-1 rounded-xl border border-[#2a2a3a] w-fit shrink-0">
+                    {STATUS_TABS.map((tab) => (
+                        <button
+                            key={tab.value}
+                            onClick={() => handleTabChange(tab.value)}
+                            className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all border-none cursor-pointer ${
+                                activeTab === tab.value
+                                    ? 'bg-[#e63946] text-white shadow-md'
+                                    : 'text-[#8888aa] bg-transparent hover:text-white hover:bg-[#1e1e2a]'
+                            }`}
+                        >
+                            {tab.label}
+                            {activeTab === tab.value && meta.total > 0 && (
+                                <span className="ml-1.5 bg-white/20 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">
+                                    {meta.total}
+                                </span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Search box */}
+                <div className="relative flex-1 min-w-[200px] max-w-sm">
+                    <svg
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555570]"
+                        width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                     >
-                        {tab.label}
-                        {activeTab === tab.value && meta.total > 0 && (
-                            <span className="ml-1.5 bg-white/20 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">
-                                {meta.total}
-                            </span>
-                        )}
-                    </button>
-                ))}
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input
+                        type="text"
+                        value={searchInput}
+                        onChange={(e) => handleSearchInput(e.target.value)}
+                        placeholder="Cari judul berita..."
+                        className="w-full bg-[#16161f] border border-[#2a2a3a] rounded-lg pl-9 pr-9 py-2 text-sm text-white placeholder-[#555570] outline-none focus:border-[#e63946] focus:shadow-[0_0_0_3px_rgba(230,57,70,0.1)] transition-all"
+                    />
+                    {searchInput && (
+                        <button
+                            onClick={clearSearch}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#555570] hover:text-white transition-colors bg-transparent border-none cursor-pointer p-0"
+                        >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 6 6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    )}
+                </div>
             </div>
 
+            {/* Content */}
             {loading && beritas.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-32">
                     <div className="spinner"></div>
@@ -120,16 +180,27 @@ export default function AdminDashboardPage() {
                 </div>
             ) : beritas.length === 0 ? (
                 <div className="text-center py-24 bg-[#16161f] border border-[#2a2a3a] rounded-xl">
-                    <p className="text-[#8888aa] text-sm mb-4">
-                        {activeTab === 'draft'
+                    <svg className="mx-auto mb-3 text-[#555570]" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <p className="text-[#8888aa] text-sm mb-1">
+                        {searchQuery
+                            ? `Tidak ada berita dengan judul mengandung "${searchQuery}".`
+                            : activeTab === 'draft'
                             ? 'Tidak ada berita berstatus draf.'
                             : activeTab === 'published'
                             ? 'Tidak ada berita yang telah diterbitkan.'
                             : 'Belum ada berita yang ditulis.'}
                     </p>
-                    <Link href="/admin/berita/buat" className="btn btn-primary rounded-lg btn-sm">
-                        Mulai Menulis Pertama
-                    </Link>
+                    {searchQuery ? (
+                        <button onClick={clearSearch} className="btn btn-secondary rounded-lg btn-sm mt-3">
+                            Hapus Pencarian
+                        </button>
+                    ) : (
+                        <Link href="/admin/berita/buat" className="btn btn-primary rounded-lg btn-sm mt-3">
+                            Mulai Menulis Pertama
+                        </Link>
+                    )}
                 </div>
             ) : (
                 <>
@@ -181,7 +252,6 @@ export default function AdminDashboardPage() {
                                                 <div className="inline-flex gap-1 flex-wrap justify-end">
                                                     {b.status === 'draft' && (
                                                         <>
-                                                            {/* Tombol Preview - buka halaman detail di tab baru */}
                                                             <a
                                                                 href={`/berita/${b.slug}`}
                                                                 target="_blank"
@@ -214,11 +284,14 @@ export default function AdminDashboardPage() {
                         </div>
                     </div>
 
-                    <Pagination
-                        currentPage={meta.page}
-                        totalPages={meta.totalPages}
-                        onPageChange={(p) => setPage(p)}
-                    />
+                    {/* Pagination — hanya tampil jika lebih dari 1 halaman */}
+                    {meta.totalPages > 1 && (
+                        <Pagination
+                            currentPage={meta.page}
+                            totalPages={meta.totalPages}
+                            onPageChange={(p) => setPage(p)}
+                        />
+                    )}
                 </>
             )}
         </main>
