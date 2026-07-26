@@ -99,6 +99,11 @@ export default function EditBeritaPage() {
             return;
         }
 
+        if (content.includes('data:image/')) {
+            setError('Beberapa gambar di dalam artikel sedang diunggah ke server. Silakan tunggu beberapa detik lalu tekan tombol perbarui kembali.');
+            return;
+        }
+
         setLoading(true);
         try {
             const data = { title, content, thumbnail, category, status };

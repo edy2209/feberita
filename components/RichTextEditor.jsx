@@ -10,6 +10,64 @@ import { useState } from 'react';
 import { uploadImage } from '@/lib/api';
 
 // ============================================================
+// Helper: Convert Base64 string to a File object
+// ============================================================
+function base64ToFile(base64Str, filename) {
+    const arr = base64Str.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+}
+
+// ============================================================
+// Helper: Scan and upload base64 images inside editor
+// ============================================================
+const scanAndUploadBase64 = (editor, token) => {
+    if (!token || !editor) return;
+    
+    let base64Nodes = [];
+    editor.state.doc.descendants((node, pos) => {
+        if (node.type.name === 'image' && node.attrs.src && node.attrs.src.startsWith('data:image/')) {
+            base64Nodes.push({ node, pos, src: node.attrs.src });
+        }
+    });
+
+    base64Nodes.forEach(({ node, pos, src }) => {
+        try {
+            if (!window.pendingUploads) window.pendingUploads = new Set();
+            if (window.pendingUploads.has(src)) return;
+            window.pendingUploads.add(src);
+
+            const ext = src.split(';')[0].split('/')[1] || 'png';
+            const file = base64ToFile(src, `content-image-${Date.now()}.${ext}`);
+            
+            uploadImage(token, file).then(res => {
+                window.pendingUploads.delete(src);
+                if (res.status === 'success' && res.url) {
+                    const tr = editor.state.tr.setNodeMarkup(pos, undefined, {
+                        ...node.attrs,
+                        src: res.url
+                    });
+                    editor.view.dispatch(tr);
+                } else {
+                    console.error("Gagal mengunggah base64:", res.message);
+                }
+            }).catch(err => {
+                console.error("Error mengunggah base64:", err);
+                window.pendingUploads.delete(src);
+            });
+        } catch (e) {
+            console.error("Gagal memproses base64 image:", e);
+        }
+    });
+};
+
+// ============================================================
 // Custom Extension: PageBreak
 // Tampil sebagai garis merah bergaris putus di editor,
 // disimpan sebagai <!--nextpage--> di database.
@@ -99,6 +157,9 @@ export default function RichTextEditor({ value, onChange, token }) {
         ],
         content: prepareContentForEditor(value),
         onUpdate: ({ editor }) => {
+            // Scan dan upload base64 otomatis jika terdeteksi di dokumen
+            scanAndUploadBase64(editor, token);
+
             const rawHtml = editor.getHTML();
             onChange(prepareHtmlForSave(rawHtml));
         },
@@ -120,7 +181,6 @@ export default function RichTextEditor({ value, onChange, token }) {
                                 event.preventDefault();
                                 uploadImage(token, file).then(res => {
                                     if (res.status === 'success' && res.url) {
-                                        // Sisipkan gambar yang sudah di-upload ke editor
                                         view.dispatch(view.state.tr.replaceSelectionWith(
                                             view.state.schema.nodes.image.create({ src: res.url })
                                         ));
