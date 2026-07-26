@@ -6,6 +6,12 @@ import Cookies from 'js-cookie';
 import { getBeritaAdmin, publishBerita, deleteBerita } from '@/lib/api';
 import Pagination from '@/components/Pagination';
 
+const STATUS_TABS = [
+    { label: 'Semua', value: '' },
+    { label: 'Diterbitkan', value: 'published' },
+    { label: 'Draf', value: 'draft' },
+];
+
 export default function AdminDashboardPage() {
     const router = useRouter();
     const token = Cookies.get('admin_token');
@@ -14,17 +20,18 @@ export default function AdminDashboardPage() {
     const [beritas, setBeritas] = useState([]);
     const [page, setPage] = useState(1);
     const [meta, setMeta] = useState({ page: 1, totalPages: 1, limit: 10, total: 0 });
+    const [activeTab, setActiveTab] = useState('');
 
     useEffect(() => {
         if (!token) { router.push('/admin/login'); return; }
         loadData();
-    }, [page, token]);
+    }, [page, token, activeTab]);
 
     const loadData = async () => {
         if (!token) return;
         setLoading(true);
         try {
-            const newsRes = await getBeritaAdmin(token, { page, limit: 10 });
+            const newsRes = await getBeritaAdmin(token, { page, limit: 10, status: activeTab });
             setBeritas(newsRes.data || []);
             setMeta(newsRes.meta || { page: 1, totalPages: 1, limit: 10, total: 0 });
         } catch (err) {
@@ -32,6 +39,11 @@ export default function AdminDashboardPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleTabChange = (tabValue) => {
+        setActiveTab(tabValue);
+        setPage(1);
     };
 
     const handlePublish = async (slug) => {
@@ -67,7 +79,7 @@ export default function AdminDashboardPage() {
     return (
         <main className="flex-grow p-8">
             {/* Page Header */}
-            <div className="flex items-center justify-between mb-8 border-b border-[#2a2a3a] pb-4">
+            <div className="flex items-center justify-between mb-6 border-b border-[#2a2a3a] pb-4">
                 <div>
                     <h1 className="text-2xl font-extrabold text-white flex items-center gap-3">
                         <span className="text-[#e63946]">📰</span> Manajemen Berita
@@ -79,6 +91,28 @@ export default function AdminDashboardPage() {
                 </Link>
             </div>
 
+            {/* Status Filter Tabs */}
+            <div className="flex gap-1 mb-5 bg-[#111118] p-1 rounded-xl border border-[#2a2a3a] w-fit">
+                {STATUS_TABS.map((tab) => (
+                    <button
+                        key={tab.value}
+                        onClick={() => handleTabChange(tab.value)}
+                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all border-none cursor-pointer ${
+                            activeTab === tab.value
+                                ? 'bg-[#e63946] text-white shadow-md'
+                                : 'text-[#8888aa] bg-transparent hover:text-white hover:bg-[#1e1e2a]'
+                        }`}
+                    >
+                        {tab.label}
+                        {activeTab === tab.value && meta.total > 0 && (
+                            <span className="ml-1.5 bg-white/20 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">
+                                {meta.total}
+                            </span>
+                        )}
+                    </button>
+                ))}
+            </div>
+
             {loading && beritas.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-32">
                     <div className="spinner"></div>
@@ -86,7 +120,13 @@ export default function AdminDashboardPage() {
                 </div>
             ) : beritas.length === 0 ? (
                 <div className="text-center py-24 bg-[#16161f] border border-[#2a2a3a] rounded-xl">
-                    <p className="text-[#8888aa] text-sm mb-4">Belum ada berita yang ditulis.</p>
+                    <p className="text-[#8888aa] text-sm mb-4">
+                        {activeTab === 'draft'
+                            ? 'Tidak ada berita berstatus draf.'
+                            : activeTab === 'published'
+                            ? 'Tidak ada berita yang telah diterbitkan.'
+                            : 'Belum ada berita yang ditulis.'}
+                    </p>
                     <Link href="/admin/berita/buat" className="btn btn-primary rounded-lg btn-sm">
                         Mulai Menulis Pertama
                     </Link>
@@ -131,21 +171,33 @@ export default function AdminDashboardPage() {
                                             </td>
                                             <td className="p-4">
                                                 <span className={`badge text-[10px] ${b.status === 'published' ? 'badge-published' : 'badge-draft'}`}>
-                                                    {b.status}
+                                                    {b.status === 'published' ? '✓ Diterbitkan' : '✎ Draf'}
                                                 </span>
                                             </td>
                                             <td className="p-4 text-sm font-semibold text-[#8888aa]">
                                                 {b.jumlah_penonton?.toLocaleString('id-ID') || 0}
                                             </td>
                                             <td className="p-4 text-right">
-                                                <div className="inline-flex gap-1">
+                                                <div className="inline-flex gap-1 flex-wrap justify-end">
                                                     {b.status === 'draft' && (
-                                                        <button
-                                                            onClick={() => handlePublish(b.slug)}
-                                                            className="btn btn-success btn-sm rounded-lg"
-                                                        >
-                                                            Publish
-                                                        </button>
+                                                        <>
+                                                            {/* Tombol Preview - buka halaman detail di tab baru */}
+                                                            <a
+                                                                href={`/berita/${b.slug}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="btn btn-sm rounded-lg text-[10px] font-semibold px-2.5 py-1"
+                                                                style={{ background: 'rgba(100,150,255,0.15)', color: '#7aadff', border: '1px solid rgba(100,150,255,0.25)' }}
+                                                            >
+                                                                👁 Preview
+                                                            </a>
+                                                            <button
+                                                                onClick={() => handlePublish(b.slug)}
+                                                                className="btn btn-success btn-sm rounded-lg"
+                                                            >
+                                                                Publish
+                                                            </button>
+                                                        </>
                                                     )}
                                                     <Link href={`/admin/berita/edit/${b.slug}`} className="btn btn-secondary btn-sm rounded-lg">
                                                         Edit

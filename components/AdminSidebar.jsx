@@ -2,8 +2,23 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { useState, useEffect } from 'react';
 
-const menuItems = [
+// Decode JWT payload without external library
+function decodeJwt(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(jsonPayload);
+    } catch {
+        return null;
+    }
+}
+
+const baseMenuItems = [
     {
         href: '/admin',
         label: 'Dashboard',
@@ -35,14 +50,40 @@ const menuItems = [
     },
 ];
 
+const adminOnlyMenuItems = [
+    {
+        href: '/admin/jurnalis',
+        label: 'Kelola Jurnalis',
+        icon: (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+        ),
+    },
+];
+
 export default function AdminSidebar() {
     const pathname = usePathname();
     const router = useRouter();
+    const [userRole, setUserRole] = useState(null);
+
+    useEffect(() => {
+        const token = Cookies.get('admin_token');
+        if (token) {
+            const payload = decodeJwt(token);
+            setUserRole(payload?.role || null);
+        }
+    }, []);
 
     const handleLogout = () => {
         Cookies.remove('admin_token');
         router.push('/');
     };
+
+    const menuItems = userRole === 'admin'
+        ? [...baseMenuItems, ...adminOnlyMenuItems]
+        : baseMenuItems;
 
     return (
         <aside className="w-64 shrink-0 bg-[#111118] border-r border-[#2a2a3a] min-h-screen flex flex-col sticky top-0 h-screen">
@@ -53,6 +94,15 @@ export default function AdminSidebar() {
                     <span className="text-xl font-black text-white">News</span>
                     <span className="text-[10px] font-bold text-[#8888aa] ml-1 tracking-widest">REDAKSI</span>
                 </Link>
+                {userRole && (
+                    <span className={`mt-1 inline-block text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full ${
+                        userRole === 'admin'
+                            ? 'bg-[rgba(230,57,70,0.15)] text-[#e63946] border border-[rgba(230,57,70,0.25)]'
+                            : 'bg-[rgba(100,150,255,0.15)] text-[#7aadff] border border-[rgba(100,150,255,0.25)]'
+                    }`}>
+                        {userRole}
+                    </span>
+                )}
             </div>
 
             {/* Navigation */}

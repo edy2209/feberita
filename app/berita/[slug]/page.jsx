@@ -1,6 +1,7 @@
 import { getBeritaBySlug, getBeritaPopular, getKategori, getBeritaList } from '@/lib/api';
 import BeritaDetailClient from '@/components/BeritaDetailClient';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 // ============================================================
 // DYNAMIC SEO METADATA (SSR)
@@ -9,7 +10,9 @@ import { notFound } from 'next/navigation';
 export async function generateMetadata({ params }) {
     const { slug } = await params;
     try {
-        const res = await getBeritaBySlug(slug);
+        const cookieStore = await cookies();
+        const token = cookieStore.get('admin_token')?.value || null;
+        const res = await getBeritaBySlug(slug, token);
         if (!res || !res.data) {
             return {
                 title: 'Berita Tidak Ditemukan — RTNewsSumbar',
@@ -57,9 +60,13 @@ export async function generateMetadata({ params }) {
 export default async function Page({ params }) {
     const { slug } = await params;
 
+    // Ambil token dari cookie (jika admin/jurnalis sedang login, mereka bisa preview draf)
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_token')?.value || null;
+
     // Fetch data paralel di server
     const [beritaRes, catsRes, popsRes, latsRes] = await Promise.all([
-        getBeritaBySlug(slug),
+        getBeritaBySlug(slug, token),
         getKategori(),
         getBeritaPopular(5),
         getBeritaList({ limit: 5 })
