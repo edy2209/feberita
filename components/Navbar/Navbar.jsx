@@ -155,13 +155,13 @@ export default function Navbar({ kategoris = [] }) {
                                 value={searchVal}
                                 onChange={(e) => setSearchVal(e.target.value)}
                                 placeholder="Cari berita terkini..."
-                                className="flex-1 bg-transparent border-none outline-none px-4 py-4 text-base text-white placeholder-[#555570]"
+                                className="flex-1 bg-transparent border-none outline-none px-4 py-4 text-base text-white placeholder-[#555570] min-w-0"
                             />
                             {searchVal && (
                                 <button
                                     type="button"
                                     onClick={() => setSearchVal('')}
-                                    className="px-3 text-[#555570] hover:text-white transition-colors cursor-pointer bg-transparent border-none"
+                                    className="px-3 text-[#555570] hover:text-white transition-colors cursor-pointer bg-transparent border-none shrink-0"
                                 >
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M18 6 6 18M6 6l12 12"/>
