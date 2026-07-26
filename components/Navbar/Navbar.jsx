@@ -75,6 +75,9 @@ export default function Navbar({ kategoris = [] }) {
                         <span className="text-sm font-semibold text-[#8888aa] ml-0.5">Sumbar</span>
                     </Link>
 
+                    {/* Spacer untuk mobile agar pencarian & hamburger terdorong ke kanan */}
+                    <div className="flex-1 md:hidden" />
+
                     {/* Search bar - desktop only */}
                     <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-lg bg-[#16161f] border border-[#2a2a3a] rounded-full overflow-hidden transition-all focus-within:border-[#e63946] focus-within:shadow-[0_0_0_3px_rgba(230,57,70,0.15)]">
                         <input
