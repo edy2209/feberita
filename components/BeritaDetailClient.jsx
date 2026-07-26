@@ -44,10 +44,9 @@ export default function BeritaDetailClient({ berita, populars = [], latests = []
             <Navbar kategoris={kategoris} />
 
             <main className="flex-grow max-w-[1200px] w-full mx-auto px-5 py-8">
-                {/* Back button */}
                 <button
                     onClick={() => router.back()}
-                    className="flex items-center gap-2 text-sm text-[#8888aa] hover:text-[#e63946] mb-6 transition-colors bg-transparent border-none cursor-pointer"
+                    className="inline-flex items-center gap-2 text-sm text-[#8888aa] hover:text-[#e63946] mb-6 transition-all bg-transparent border-none cursor-pointer py-2 px-3 -ml-3 rounded-lg hover:bg-[#16161f] active:bg-[#2a2a3a] select-none"
                 >
                     ← Kembali
                 </button>
