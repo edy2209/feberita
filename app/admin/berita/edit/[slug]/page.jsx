@@ -58,7 +58,7 @@ export default function EditBeritaPage() {
             try {
                 const [catsRes, postRes] = await Promise.all([
                     getKategori(),
-                    getBeritaBySlug(slug)
+                    getBeritaBySlug(slug, token)
                 ]);
                 
                 setKategoris(catsRes.data || []);
