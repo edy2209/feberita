@@ -127,17 +127,28 @@ function HomeContent() {
                                 <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 pb-2 border-b border-[#2a2a3a] flex items-center gap-2">
                                     🔥 Paling Populer
                                 </h3>
-                                <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-hide md:flex-col md:divide-y md:divide-[#2a2a3a] md:gap-0 md:pb-0">
-                                    {populars.length === 0 ? (
-                                        <p className="text-xs text-[#8888aa] py-3">Belum ada berita terpopuler.</p>
-                                    ) : (
-                                        populars.map((b) => (
-                                            <div key={b._id} className="w-[280px] shrink-0 md:w-auto">
-                                                <NewsCard berita={b} variant="horizontal" />
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
+                                {populars.length === 0 ? (
+                                    <p className="text-xs text-[#8888aa] py-3">Belum ada berita terpopuler.</p>
+                                ) : (
+                                    <>
+                                        {/* Mobile: card besar seperti Berita Terbaru, bisa digeser */}
+                                        <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-hide md:hidden">
+                                            {populars.map((b) => (
+                                                <div key={b._id} className="w-[260px] shrink-0 flex">
+                                                    <NewsCard berita={b} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                        {/* Desktop: horizontal list di sidebar */}
+                                        <div className="hidden md:flex md:flex-col md:divide-y md:divide-[#2a2a3a]">
+                                            {populars.map((b) => (
+                                                <div key={b._id} className="w-full">
+                                                    <NewsCard berita={b} variant="horizontal" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
                             {/* Tags/Quick Categories widget */}
