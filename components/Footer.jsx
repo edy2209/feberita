@@ -12,21 +12,10 @@ export default function Footer({ kategoris = [] }) {
                             <span className="text-2xl font-black text-white">News</span>
                             <span className="text-sm font-semibold text-[#8888aa] ml-0.5">Sumbar</span>
                         </div>
-                        <p className="text-sm text-[#8888aa] leading-relaxed mb-4">
+                        {/* bikin tulisan rata kiri dan kanan */}
+                        <p className="text-sm text-[#8888aa] leading-relaxed mb-4 text-justify ">
                             Portal berita terpercaya Sumatera Barat. Menyajikan informasi akurat, cepat, dan berimbang untuk masyarakat Sumbar.
                         </p>
-                        <div className="space-y-1.5 text-xs text-[#555570]">
-                            <p className="flex items-start gap-2">
-                                <span>📍</span>
-                                <span>Sidodadi Jorong Limau Puruik, Kec. Kinali, Kab. Pasaman Barat</span>
-                            </p>
-                            <p className="flex items-center gap-2">
-                                <span>✉️</span>
-                                <a href="mailto:rtnewssumbar@gmail.com" className="hover:text-[#e63946] transition-colors">
-                                    rtnewssumbar@gmail.com
-                                </a>
-                            </p>
-                        </div>
                     </div>
 
                     {/* Kategori */}
