@@ -12,9 +12,21 @@ export default function Footer({ kategoris = [] }) {
                             <span className="text-2xl font-black text-white">News</span>
                             <span className="text-sm font-semibold text-[#8888aa] ml-0.5">Sumbar</span>
                         </div>
-                        <p className="text-sm text-[#8888aa] leading-relaxed">
+                        <p className="text-sm text-[#8888aa] leading-relaxed mb-4">
                             Portal berita terpercaya Sumatera Barat. Menyajikan informasi akurat, cepat, dan berimbang untuk masyarakat Sumbar.
                         </p>
+                        <div className="space-y-1.5 text-xs text-[#555570]">
+                            <p className="flex items-start gap-2">
+                                <span>📍</span>
+                                <span>Sidodadi Jorong Limau Puruik, Kec. Kinali, Kab. Pasaman Barat</span>
+                            </p>
+                            <p className="flex items-center gap-2">
+                                <span>✉️</span>
+                                <a href="mailto:rtnewssumbar@gmail.com" className="hover:text-[#e63946] transition-colors">
+                                    rtnewssumbar@gmail.com
+                                </a>
+                            </p>
+                        </div>
                     </div>
 
                     {/* Kategori */}
@@ -36,7 +48,7 @@ export default function Footer({ kategoris = [] }) {
                         <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Tentang Kami</h4>
                         <ul className="space-y-2">
                             <li><Link href="/" className="text-sm text-[#8888aa] hover:text-[#e63946] transition-colors">Beranda</Link></li>
-                            <li><Link href="/admin/login" className="text-sm text-[#8888aa] hover:text-[#e63946] transition-colors">Masuk Redaksi</Link></li>
+                            <li><Link href="/tentang" className="text-sm text-[#8888aa] hover:text-[#e63946] transition-colors">Profil Redaksi</Link></li>
                         </ul>
                     </div>
                 </div>
@@ -50,3 +62,4 @@ export default function Footer({ kategoris = [] }) {
         </footer>
     );
 }
+

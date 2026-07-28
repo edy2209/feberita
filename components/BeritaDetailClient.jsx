@@ -199,29 +199,53 @@ export default function BeritaDetailClient({ berita, populars = [], latests = []
                         <p className="text-sm text-[#8888aa] py-6 text-center">Tidak ada berita terkait ditemukan.</p>
                     ) : (
                         <>
-                            {/* Grid cards — 2 kolom mobile, 3 kolom desktop */}
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                            {/* Grid cards — responsif: 1 kolom < 400px, 2 kolom mobile, 3 kolom desktop */}
+                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
                                 {relateds.map((b) => (
-                                    <NewsCard key={b._id} berita={b} />
+                                    <div key={b._id} className="flex">
+                                        <NewsCard berita={b} />
+                                    </div>
                                 ))}
                             </div>
 
-                            {/* Pagination berita terkait */}
+                            {/* Pagination berita terkait — rapi di mobile dan desktop */}
                             {relatedMeta.totalPages > 1 && (
-                                <div className="mt-8 flex flex-col items-center gap-3">
-                                    <div className="flex items-center gap-2">
+                                <div className="mt-8 flex flex-col items-center gap-2">
+                                    {/* Mobile: hanya tombol Sebelumnya / Berikutnya + info halaman */}
+                                    <div className="flex items-center gap-2 sm:hidden w-full justify-between">
                                         <button
-                                            onClick={() => { setRelatedPage(p => Math.max(1, p - 1)); window.scrollTo({ top: document.getElementById('berita-terkait')?.offsetTop || 600, behavior: 'smooth' }); }}
+                                            onClick={() => { setRelatedPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 500, behavior: 'smooth' }); }}
+                                            disabled={relatedPage === 1}
+                                            className="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-[#2a2a3a] bg-[#16161f] text-[#8888aa] hover:border-[#e63946] hover:text-[#e63946] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                        >
+                                            ← Sebelumnya
+                                        </button>
+                                        <span className="text-xs text-[#555570] shrink-0 px-2">
+                                            {relatedPage}/{relatedMeta.totalPages}
+                                        </span>
+                                        <button
+                                            onClick={() => { setRelatedPage(p => Math.min(relatedMeta.totalPages, p + 1)); window.scrollTo({ top: 500, behavior: 'smooth' }); }}
+                                            disabled={relatedPage === relatedMeta.totalPages}
+                                            className="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-[#2a2a3a] bg-[#16161f] text-[#8888aa] hover:border-[#e63946] hover:text-[#e63946] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                        >
+                                            Berikutnya →
+                                        </button>
+                                    </div>
+
+                                    {/* Desktop: tombol halaman lengkap */}
+                                    <div className="hidden sm:flex items-center gap-2">
+                                        <button
+                                            onClick={() => { setRelatedPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 500, behavior: 'smooth' }); }}
                                             disabled={relatedPage === 1}
                                             className="px-4 py-2 rounded-lg text-sm font-semibold border border-[#2a2a3a] bg-[#16161f] text-[#8888aa] hover:border-[#e63946] hover:text-[#e63946] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                         >
-                                            ← Sebelumnya
+                                            ←
                                         </button>
 
                                         {Array.from({ length: relatedMeta.totalPages }, (_, i) => i + 1).map(p => (
                                             <button
                                                 key={p}
-                                                onClick={() => { setRelatedPage(p); window.scrollTo({ top: 600, behavior: 'smooth' }); }}
+                                                onClick={() => { setRelatedPage(p); window.scrollTo({ top: 500, behavior: 'smooth' }); }}
                                                 className={`w-9 h-9 rounded-lg font-bold text-xs border transition-all ${
                                                     relatedPage === p
                                                         ? 'bg-[#e63946] border-[#e63946] text-white shadow-[0_0_10px_rgba(230,57,70,0.3)]'
@@ -233,15 +257,16 @@ export default function BeritaDetailClient({ berita, populars = [], latests = []
                                         ))}
 
                                         <button
-                                            onClick={() => { setRelatedPage(p => Math.min(relatedMeta.totalPages, p + 1)); window.scrollTo({ top: 600, behavior: 'smooth' }); }}
+                                            onClick={() => { setRelatedPage(p => Math.min(relatedMeta.totalPages, p + 1)); window.scrollTo({ top: 500, behavior: 'smooth' }); }}
                                             disabled={relatedPage === relatedMeta.totalPages}
                                             className="px-4 py-2 rounded-lg text-sm font-semibold border border-[#2a2a3a] bg-[#16161f] text-[#8888aa] hover:border-[#e63946] hover:text-[#e63946] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                         >
-                                            Berikutnya →
+                                            →
                                         </button>
                                     </div>
+
                                     <span className="text-xs text-[#555570]">
-                                        Halaman {relatedPage} dari {relatedMeta.totalPages} • {relatedMeta.total} berita terkait
+                                        {relatedMeta.total} berita terkait ditemukan
                                     </span>
                                 </div>
                             )}
