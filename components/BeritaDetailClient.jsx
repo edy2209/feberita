@@ -55,10 +55,15 @@ export default function BeritaDetailClient({ berita, populars = [], latests = []
                     {/* Left/Main Column: News Article */}
                     <article className="lg:col-span-2">
                         {/* Meta info */}
-                        <div className="mb-4">
-                            <span className="bg-[#e63946] text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
-                                {berita.category}
-                            </span>
+                        <div className="mb-4 flex flex-wrap gap-2">
+                            {(Array.isArray(berita.categories) && berita.categories.length > 0
+                                ? berita.categories
+                                : berita.category ? [berita.category] : []
+                            ).map((cat, i) => (
+                                <span key={i} className="bg-[#e63946] text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                                    {cat}
+                                </span>
+                            ))}
                         </div>
 
                         <h1 className="text-white text-3xl md:text-4xl font-extrabold leading-tight mb-4">

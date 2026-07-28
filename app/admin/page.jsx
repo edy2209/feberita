@@ -238,7 +238,14 @@ export default function AdminDashboardPage() {
                                                 </div>
                                             </td>
                                             <td className="p-4">
-                                                <span className="badge badge-category text-[10px]">{b.category}</span>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {(Array.isArray(b.categories) && b.categories.length > 0
+                                                        ? b.categories
+                                                        : b.category ? [b.category] : []
+                                                    ).map((cat, i) => (
+                                                        <span key={i} className="badge badge-category text-[10px]">{cat}</span>
+                                                    ))}
+                                                </div>
                                             </td>
                                             <td className="p-4">
                                                 <span className={`badge text-[10px] ${b.status === 'published' ? 'badge-published' : 'badge-draft'}`}>
