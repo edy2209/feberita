@@ -14,7 +14,7 @@ export default function EditBeritaPage() {
     const [kategoris, setKategoris] = useState([]);
     const [title, setTitle] = useState('');
     const [thumbnail, setThumbnail] = useState('');
-    const [category, setCategory] = useState('');
+    const [selectedCategories, setSelectedCategories] = useState([]); // Multi-kategori
     const [status, setStatus] = useState('draft');
     const [content, setContent] = useState('');
     
@@ -72,7 +72,11 @@ export default function EditBeritaPage() {
 
                 setTitle(post.title || '');
                 setThumbnail(post.thumbnail || '');
-                setCategory(post.category || '');
+                // Muat kategori yang sudah ada: gunakan categories array jika ada, fallback ke category string
+                const existingCats = Array.isArray(post.categories) && post.categories.length > 0
+                    ? post.categories
+                    : post.category ? [post.category] : [];
+                setSelectedCategories(existingCats);
                 setStatus(post.status || 'draft');
                 setContent(post.content || '');
             } catch (err) {
@@ -89,8 +93,8 @@ export default function EditBeritaPage() {
         e.preventDefault();
         setError('');
 
-        if (!category) {
-            setError('Silakan pilih kategori terlebih dahulu.');
+        if (selectedCategories.length === 0) {
+            setError('Silakan pilih minimal satu kategori.');
             return;
         }
 
@@ -106,7 +110,11 @@ export default function EditBeritaPage() {
 
         setLoading(true);
         try {
-            const data = { title, content, thumbnail, category, status };
+            const data = {
+                title, content, thumbnail, status,
+                categories: selectedCategories,
+                category: selectedCategories[0],
+            };
             const res = await updateBerita(token, slug, data);
             if (res.status === 'success') {
                 router.push('/admin');
@@ -182,23 +190,37 @@ export default function EditBeritaPage() {
                                         ⚙️ Pengaturan Publikasi
                                     </h3>
 
-                                    {/* Category Select */}
+                                    {/* Category Multi-Select (Checkboxes) */}
                                     <div className="form-group">
-                                        <label className="form-label text-xs">Kategori Berita</label>
+                                        <label className="form-label text-xs">Kategori Berita <span className="text-[#e63946]">*</span></label>
+                                        <p className="text-[10px] text-[#555570] mb-2">Pilih satu atau lebih kategori yang sesuai.</p>
                                         {kategoris.length === 0 ? (
                                             <p className="text-xs text-[#8888aa]">Silakan buat kategori di dashboard terlebih dahulu.</p>
                                         ) : (
-                                            <select
-                                                value={category}
-                                                onChange={(e) => setCategory(e.target.value)}
-                                                className="form-select text-sm"
-                                            >
+                                            <div className="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1">
                                                 {kategoris.map((k) => (
-                                                    <option key={k._id} value={k.name}>
-                                                        {k.name}
-                                                    </option>
+                                                    <label key={k._id} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer border transition-all ${
+                                                        selectedCategories.includes(k.name)
+                                                            ? 'bg-[rgba(230,57,70,0.12)] border-[#e63946]'
+                                                            : 'border-[#2a2a3a] hover:border-[#555570]'
+                                                    }`}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedCategories.includes(k.name)}
+                                                            onChange={() => setSelectedCategories(prev =>
+                                                                prev.includes(k.name) ? prev.filter(c => c !== k.name) : [...prev, k.name]
+                                                            )}
+                                                            className="accent-[#e63946] w-3.5 h-3.5 shrink-0"
+                                                        />
+                                                        <span className="text-sm text-[#f0f0f5]">{k.name}</span>
+                                                    </label>
                                                 ))}
-                                            </select>
+                                            </div>
+                                        )}
+                                        {selectedCategories.length > 0 && (
+                                            <p className="text-[10px] text-[#e63946] mt-1.5 font-semibold">
+                                                ✓ {selectedCategories.length} kategori dipilih: {selectedCategories.join(', ')}
+                                            </p>
                                         )}
                                     </div>
 

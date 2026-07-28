@@ -2,6 +2,8 @@
 // Akses: https://rtnewssumbar.my.id/sitemap.xml
 // Otomatis mengambil semua artikel published dari database
 
+export const dynamic = 'force-dynamic'; // Selalu render server-side, tidak di-cache saat build
+
 const BASE_URL = 'https://rtnewssumbar.my.id';
 // Saat berjalan di dalam Docker container, gunakan URL internal
 const API_URL = process.env.SERVER_API_URL || 'http://app:3000';

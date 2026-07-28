@@ -123,17 +123,28 @@ export default function BeritaDetailClient({ berita, populars = [], latests = []
                             <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 pb-2 border-b border-[#2a2a3a] flex items-center gap-2">
                                 🔥 Paling Populer
                             </h3>
-                            <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-hide md:flex-col md:divide-y md:divide-[#2a2a3a] md:gap-0 md:pb-0">
-                                {populars.length === 0 ? (
-                                    <p className="text-xs text-[#8888aa] py-3">Belum ada berita terpopuler.</p>
-                                ) : (
-                                    populars.map((b) => (
-                                        <div key={b._id} className="w-[280px] shrink-0 md:w-auto">
-                                            <NewsCard berita={b} variant="horizontal" />
-                                        </div>
-                                    ))
-                                )}
-                            </div>
+                            {populars.length === 0 ? (
+                                <p className="text-xs text-[#8888aa] py-3">Belum ada berita terpopuler.</p>
+                            ) : (
+                                <>
+                                    {/* Mobile: card besar bisa digeser */}
+                                    <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-hide md:hidden">
+                                        {populars.map((b) => (
+                                            <div key={b._id} className="w-[240px] shrink-0 flex">
+                                                <NewsCard berita={b} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {/* Desktop: horizontal list di sidebar */}
+                                    <div className="hidden md:flex md:flex-col md:divide-y md:divide-[#2a2a3a]">
+                                        {populars.map((b) => (
+                                            <div key={b._id}>
+                                                <NewsCard berita={b} variant="horizontal" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         {/* Latest News widget */}
@@ -141,17 +152,28 @@ export default function BeritaDetailClient({ berita, populars = [], latests = []
                             <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 pb-2 border-b border-[#2a2a3a] flex items-center gap-2">
                                 📅 Berita Terbaru
                             </h3>
-                            <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-hide md:flex-col md:divide-y md:divide-[#2a2a3a] md:gap-0 md:pb-0">
-                                {latests.length === 0 ? (
-                                    <p className="text-xs text-[#8888aa] py-3">Belum ada berita terbaru.</p>
-                                ) : (
-                                    latests.map((b) => (
-                                        <div key={b._id} className="w-[280px] shrink-0 md:w-auto">
-                                            <NewsCard berita={b} variant="horizontal" />
-                                        </div>
-                                    ))
-                                )}
-                            </div>
+                            {latests.length === 0 ? (
+                                <p className="text-xs text-[#8888aa] py-3">Belum ada berita terbaru.</p>
+                            ) : (
+                                <>
+                                    {/* Mobile: card besar bisa digeser */}
+                                    <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-hide md:hidden">
+                                        {latests.map((b) => (
+                                            <div key={b._id} className="w-[240px] shrink-0 flex">
+                                                <NewsCard berita={b} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {/* Desktop: horizontal list di sidebar */}
+                                    <div className="hidden md:flex md:flex-col md:divide-y md:divide-[#2a2a3a]">
+                                        {latests.map((b) => (
+                                            <div key={b._id}>
+                                                <NewsCard berita={b} variant="horizontal" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
