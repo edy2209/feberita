@@ -40,11 +40,11 @@ function HomeContent() {
             try {
                 const res = await getBeritaList({
                     page: activePage,
-                    limit: 15, // Tampilkan 15 berita per halaman
+                    limit: 10, // Tampilkan 10 berita per halaman
                     category: activeCategory
                 });
                 setBeritas(res.data || []);
-                setMeta(res.meta || { page: 1, totalPages: 1, limit: 15, total: 0 });
+                setMeta(res.meta || { page: 1, totalPages: 1, limit: 10, total: 0 });
             } catch (err) {
                 console.error(err);
             } finally {
