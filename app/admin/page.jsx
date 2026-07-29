@@ -204,7 +204,69 @@ export default function AdminDashboardPage() {
                 </div>
             ) : (
                 <>
-                    <div className="bg-[#16161f] border border-[#2a2a3a] rounded-xl overflow-hidden">
+                    {/* ======== MOBILE: Card List ======== */}
+                    <div className="md:hidden space-y-3">
+                        {beritas.map((b) => (
+                            <div key={b._id} className="bg-[#16161f] border border-[#2a2a3a] rounded-xl p-4">
+                                {/* Baris atas: thumbnail + judul + status */}
+                                <div className="flex gap-3 mb-3">
+                                    <img
+                                        src={b.thumbnail}
+                                        alt=""
+                                        className="w-16 h-12 object-cover rounded-lg shrink-0 bg-[#0a0a0f]"
+                                        onError={(e) => { e.target.src = 'https://placehold.co/64x48/16161f/555570?text=RT'; }}
+                                    />
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="text-sm font-semibold text-white leading-snug line-clamp-2 mb-1">{b.title}</h4>
+                                        <span className="text-[10px] text-[#8888aa]">{b.author?.name || 'Redaksi'} — {new Date(b.createdAt).toLocaleDateString('id-ID')}</span>
+                                    </div>
+                                </div>
+
+                                {/* Baris tengah: kategori + status + views */}
+                                <div className="flex flex-wrap items-center gap-2 mb-3 pb-3 border-b border-[#2a2a3a]">
+                                    <div className="flex flex-wrap gap-1 flex-1">
+                                        {(Array.isArray(b.categories) && b.categories.length > 0
+                                            ? b.categories : b.category ? [b.category] : []
+                                        ).map((cat, i) => (
+                                            <span key={i} className="badge badge-category text-[9px]">{cat}</span>
+                                        ))}
+                                    </div>
+                                    <span className={`badge text-[9px] shrink-0 ${b.status === 'published' ? 'badge-published' : 'badge-draft'}`}>
+                                        {b.status === 'published' ? '✓ Diterbitkan' : '✎ Draf'}
+                                    </span>
+                                    <span className="text-[10px] text-[#8888aa] shrink-0">👁 {b.jumlah_penonton?.toLocaleString('id-ID') || 0}</span>
+                                </div>
+
+                                {/* Baris bawah: tombol aksi */}
+                                <div className="flex gap-2 flex-wrap">
+                                    {b.status === 'draft' && (
+                                        <>
+                                            <a
+                                                href={`/berita/${b.slug}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="btn btn-sm rounded-lg text-[10px] font-semibold px-2.5 py-1"
+                                                style={{ background: 'rgba(100,150,255,0.15)', color: '#7aadff', border: '1px solid rgba(100,150,255,0.25)' }}
+                                            >
+                                                👁 Preview
+                                            </a>
+                                            <button
+                                                onClick={() => handlePublish(b.slug)}
+                                                className="btn btn-success btn-sm rounded-lg"
+                                            >
+                                                Publish
+                                            </button>
+                                        </>
+                                    )}
+                                    <Link href={`/admin/berita/edit/${b.slug}`} className="btn btn-secondary btn-sm rounded-lg">Edit</Link>
+                                    <button onClick={() => handleDelete(b.slug)} className="btn btn-danger btn-sm rounded-lg">Hapus</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* ======== DESKTOP: Table ======== */}
+                    <div className="hidden md:block bg-[#16161f] border border-[#2a2a3a] rounded-xl overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
@@ -291,7 +353,7 @@ export default function AdminDashboardPage() {
                         </div>
                     </div>
 
-                    {/* Pagination — hanya tampil jika lebih dari 1 halaman */}
+                    {/* Pagination */}
                     {meta.totalPages > 1 && (
                         <Pagination
                             currentPage={meta.page}

@@ -59,7 +59,7 @@ export default function NewsCard({ berita, variant = 'default' }) {
 
     // Default card
     return (
-        <Link href={`/berita/${berita.slug}`} className="group bg-[#16161f] border border-[#2a2a3a] rounded-xl overflow-hidden hover:border-[#e63946] hover:shadow-[0_0_30px_rgba(230,57,70,0.1)] transition-all duration-300 hover:-translate-y-1 flex flex-col">
+        <Link href={`/berita/${berita.slug}`} className="group bg-[#16161f] border border-[#2a2a3a] rounded-xl overflow-hidden hover:border-[#e63946] hover:shadow-[0_0_30px_rgba(230,57,70,0.1)] transition-all duration-300 hover:-translate-y-1 flex flex-col w-full">
             <div className="relative overflow-hidden aspect-[16/10]">
                 <img
                     src={berita.thumbnail}
@@ -67,22 +67,23 @@ export default function NewsCard({ berita, variant = 'default' }) {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     onError={(e) => { e.target.src = 'https://placehold.co/400x250/16161f/555570?text=RTNewsSumbar'; }}
                 />
-                <div className="absolute top-3 left-3">
-                    <span className="bg-[#e63946] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+                <div className="absolute top-2 left-2">
+                    <span className="bg-[#e63946] text-white text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 sm:py-1 rounded-full line-clamp-1 max-w-[80px] sm:max-w-none">
                         {berita.category}
                     </span>
                 </div>
             </div>
-            <div className="p-4 flex flex-col flex-1">
-                <h3 className="font-semibold text-[#f0f0f5] line-clamp-2 group-hover:text-[#e63946] transition-colors leading-snug mb-2">
+            <div className="p-2.5 sm:p-4 flex flex-col flex-1">
+                <h3 className="font-semibold text-xs sm:text-sm text-[#f0f0f5] group-hover:text-[#e63946] transition-colors leading-snug mb-2 line-clamp-2 sm:line-clamp-3">
                     {berita.title}
                 </h3>
-                <div className="flex items-center gap-2 mt-auto pt-3 border-t border-[#2a2a3a]">
-                    <span className="text-[#8888aa] text-xs">{berita.author?.name || 'Redaksi'}</span>
-                    <span className="text-[#555570] text-xs">•</span>
-                    <span className="text-[#8888aa] text-xs">{formattedDate}</span>
-                    <span className="ml-auto text-[#555570] text-xs flex items-center gap-1">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                {/* Meta info — tersembunyi di layar sangat kecil agar kartu tidak padat */}
+                <div className="flex items-center gap-1.5 mt-auto pt-2 sm:pt-3 border-t border-[#2a2a3a]">
+                    <span className="text-[#8888aa] text-[10px] sm:text-xs truncate">{berita.author?.name || 'Redaksi'}</span>
+                    <span className="text-[#555570] text-[10px] hidden sm:inline">•</span>
+                    <span className="text-[#8888aa] text-[10px] sm:text-xs hidden sm:inline shrink-0">{formattedDate}</span>
+                    <span className="ml-auto text-[#555570] text-[10px] sm:text-xs flex items-center gap-1 shrink-0">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         {berita.jumlah_penonton?.toLocaleString('id-ID') || 0}
                     </span>
                 </div>
