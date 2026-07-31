@@ -131,16 +131,16 @@ export default function EditBeritaPage() {
     if (!token) return null;
 
     return (
-        <main className="flex-grow p-8">
+        <main className="flex-grow p-4 md:p-8">
             {/* Page Header */}
-            <div className="flex items-center justify-between mb-8 border-b border-[#2a2a3a] pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 md:mb-8 border-b border-[#2a2a3a] pb-4 gap-3">
                 <div>
-                    <h1 className="text-2xl font-extrabold text-white flex items-center gap-3">
+                    <h1 className="text-xl md:text-2xl font-extrabold text-white flex items-center gap-3">
                         <span className="text-[#e63946]">📝</span> Edit Berita
                     </h1>
-                    <p className="text-sm text-[#8888aa] mt-1">Ubah dan perbarui isi artikel berita.</p>
+                    <p className="text-xs md:text-sm text-[#8888aa] mt-1">Ubah dan perbarui isi artikel berita.</p>
                 </div>
-                <Link href="/admin" className="btn btn-secondary btn-sm rounded-lg">
+                <Link href="/admin" className="btn btn-secondary btn-sm rounded-lg self-start sm:self-auto">
                     ← Kembali
                 </Link>
             </div>
@@ -158,7 +158,7 @@ export default function EditBeritaPage() {
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-8">
                             {/* Left Column: Title & Rich Text Editor */}
                             <div className="lg:col-span-2 space-y-6">
                                 <div className="form-group">

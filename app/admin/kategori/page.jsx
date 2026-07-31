@@ -71,7 +71,7 @@ export default function KategoriPage() {
     if (!token) return null;
 
     return (
-        <main className="flex-grow p-8">
+        <main className="flex-grow p-4 md:p-8">
             {/* Page Header */}
             <div className="mb-8 border-b border-[#2a2a3a] pb-4">
                 <h1 className="text-2xl font-extrabold text-white flex items-center gap-3">
@@ -141,7 +141,7 @@ export default function KategoriPage() {
                                     </div>
                                     <button
                                         onClick={() => handleDelete(k.slug, k.name)}
-                                        className="opacity-0 group-hover:opacity-100 text-[#e74c3c] hover:bg-[rgba(231,76,60,0.15)] p-1.5 rounded-lg transition-all border-none bg-transparent cursor-pointer"
+                                        className="text-[#e74c3c] hover:bg-[rgba(231,76,60,0.15)] p-1.5 rounded-lg transition-all border-none bg-transparent cursor-pointer opacity-100 md:opacity-0 md:group-hover:opacity-100"
                                         title="Hapus kategori"
                                     >
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

@@ -104,7 +104,7 @@ export default function KelolaJurnalisPage() {
     if (!token) return null;
 
     return (
-        <main className="flex-grow p-8">
+        <main className="flex-grow p-4 md:p-8">
             {/* Page Header */}
             <div className="flex items-center justify-between mb-8 border-b border-[#2a2a3a] pb-4">
                 <div>
@@ -207,21 +207,21 @@ export default function KelolaJurnalisPage() {
                         ) : (
                             <ul className="divide-y divide-[#2a2a3a]">
                                 {jurnalisList.map((j) => (
-                                    <li key={j._id} className="flex items-center justify-between px-5 py-4 hover:bg-[#1e1e2a] transition-colors">
+                                    <li key={j._id} className="flex items-center justify-between px-4 py-4 hover:bg-[#1e1e2a] transition-colors gap-3">
                                         <div className="flex items-center gap-3">
                                             {/* Avatar initials */}
                                             <div className="w-9 h-9 rounded-full bg-[rgba(100,150,255,0.15)] border border-[rgba(100,150,255,0.25)] flex items-center justify-center text-sm font-bold text-[#7aadff] shrink-0">
                                                 {j.name?.charAt(0)?.toUpperCase() || '?'}
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-semibold text-white">{j.name}</p>
-                                                <p className="text-xs text-[#8888aa]">{j.email}</p>
+                                        <div className="min-w-0">
+                                                <p className="text-sm font-semibold text-white truncate">{j.name}</p>
+                                                <p className="text-xs text-[#8888aa] truncate">{j.email}</p>
                                                 <p className="text-[10px] text-[#555570] mt-0.5">
                                                     Bergabung {new Date(j.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
                                             <span className="text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full bg-[rgba(100,150,255,0.15)] text-[#7aadff] border border-[rgba(100,150,255,0.25)]">
                                                 jurnalis
                                             </span>
