@@ -63,7 +63,7 @@ const adminOnlyMenuItems = [
     },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ isOpen, onClose }) {
     const pathname = usePathname();
     const router = useRouter();
     const [userRole, setUserRole] = useState(null);
@@ -76,6 +76,11 @@ export default function AdminSidebar() {
         }
     }, []);
 
+    // Tutup sidebar otomatis saat navigasi/pindah halaman di mobile
+    useEffect(() => {
+        if (onClose) onClose();
+    }, [pathname]);
+
     const handleLogout = () => {
         Cookies.remove('admin_token');
         router.push('/');
@@ -86,24 +91,51 @@ export default function AdminSidebar() {
         : baseMenuItems;
 
     return (
-        <aside className="w-64 shrink-0 bg-[#111118] border-r border-[#2a2a3a] min-h-screen flex flex-col sticky top-0 h-screen">
-            {/* Logo */}
-            <div className="px-6 py-5 border-b border-[#2a2a3a]">
-                <Link href="/" className="flex items-baseline gap-0.5">
-                    <span className="text-xl font-black text-[#e63946]">RT</span>
-                    <span className="text-xl font-black text-white">News</span>
-                    <span className="text-[10px] font-bold text-[#8888aa] ml-1 tracking-widest">REDAKSI</span>
-                </Link>
-                {userRole && (
-                    <span className={`mt-1 inline-block text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full ${
-                        userRole === 'admin'
-                            ? 'bg-[rgba(230,57,70,0.15)] text-[#e63946] border border-[rgba(230,57,70,0.25)]'
-                            : 'bg-[rgba(100,150,255,0.15)] text-[#7aadff] border border-[rgba(100,150,255,0.25)]'
-                    }`}>
-                        {userRole}
-                    </span>
-                )}
-            </div>
+        <>
+            {/* Overlay backdrop gelap saat sidebar terbuka di mobile */}
+            {isOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/60 z-40 md:hidden transition-opacity"
+                    onClick={onClose}
+                />
+            )}
+
+            <aside className={`
+                fixed inset-y-0 left-0 w-64 bg-[#111118] border-r border-[#2a2a3a] min-h-screen flex flex-col z-50 transition-transform duration-300
+                ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+                md:translate-x-0 md:static md:z-auto md:h-screen md:sticky md:top-0 md:shrink-0
+            `}>
+                {/* Logo */}
+                <div className="px-6 py-5 border-b border-[#2a2a3a] flex items-center justify-between">
+                    <div>
+                        <Link href="/" className="flex items-baseline gap-0.5">
+                            <span className="text-xl font-black text-[#e63946]">RT</span>
+                            <span className="text-xl font-black text-white">News</span>
+                            <span className="text-[10px] font-bold text-[#8888aa] ml-1 tracking-widest">REDAKSI</span>
+                        </Link>
+                        {userRole && (
+                            <span className={`mt-1 inline-block text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full ${
+                                userRole === 'admin'
+                                    ? 'bg-[rgba(230,57,70,0.15)] text-[#e63946] border border-[rgba(230,57,70,0.25)]'
+                                    : 'bg-[rgba(100,150,255,0.15)] text-[#7aadff] border border-[rgba(100,150,255,0.25)]'
+                            }`}>
+                                {userRole}
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Tombol close di mobile */}
+                    <button 
+                        onClick={onClose}
+                        className="text-[#8888aa] hover:text-white p-1.5 rounded-lg bg-[#16161f] border border-[#2a2a3a] md:hidden cursor-pointer"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+
 
             {/* Navigation */}
             <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
@@ -159,5 +191,6 @@ export default function AdminSidebar() {
                 </button>
             </div>
         </aside>
-    );
+    </>
+);
 }
