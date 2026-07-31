@@ -9,6 +9,6 @@ export default function robots() {
                 allow: '/',
             },
         ],
-        sitemap: 'https://rtnewssumbar.my.id/sitemap.xml',
+        sitemap: 'https://rtnewssumbar.my.id/sitemap-news.xml',
     };
 }
