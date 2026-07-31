@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from '@/components/ThemeProvider';
 
 export default function Navbar({ kategoris = [] }) {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -9,6 +10,7 @@ export default function Navbar({ kategoris = [] }) {
     const [searchVal, setSearchVal] = useState('');
     const [scrolled, setScrolled] = useState(false);
     const router = useRouter();
+    const { theme, toggleTheme } = useTheme();
     const searchInputRef = useRef(null);
 
     useEffect(() => {
@@ -93,6 +95,34 @@ export default function Navbar({ kategoris = [] }) {
                             </svg>
                         </button>
                     </form>
+
+                    {/* Theme Toggle Button — desktop & mobile */}
+                    <button
+                        onClick={toggleTheme}
+                        title={theme === 'dark' ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
+                        className="flex items-center justify-center w-9 h-9 rounded-full bg-[#16161f] border border-[#2a2a3a] text-[#8888aa] hover:text-white hover:border-[#e63946] hover:bg-[rgba(230,57,70,0.1)] transition-all cursor-pointer shrink-0"
+                        aria-label="Ganti tema"
+                    >
+                        {theme === 'dark' ? (
+                            /* Sun icon - untuk beralih ke light mode */
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="5"/>
+                                <line x1="12" y1="1" x2="12" y2="3"/>
+                                <line x1="12" y1="21" x2="12" y2="23"/>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                                <line x1="1" y1="12" x2="3" y2="12"/>
+                                <line x1="21" y1="12" x2="23" y2="12"/>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                            </svg>
+                        ) : (
+                            /* Moon icon - untuk beralih ke dark mode */
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                            </svg>
+                        )}
+                    </button>
 
                     {/* Mobile Search Icon Button — mobile only */}
                     <button
@@ -235,8 +265,28 @@ export default function Navbar({ kategoris = [] }) {
                     ))}
                 </nav>
 
-                {/* Footer info */}
-                <div className="px-5 py-4 border-t border-[#2a2a3a]">
+                {/* Footer info + theme toggle di mobile drawer */}
+                <div className="px-5 py-4 border-t border-[#2a2a3a] space-y-3">
+                    <button
+                        onClick={() => { toggleTheme(); setMenuOpen(false); }}
+                        className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#16161f] border border-[#2a2a3a] text-[#8888aa] hover:border-[#e63946] hover:text-[#e63946] transition-all text-sm font-medium cursor-pointer"
+                    >
+                        {theme === 'dark' ? (
+                            <>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                                </svg>
+                                Mode Terang
+                            </>
+                        ) : (
+                            <>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                                </svg>
+                                Mode Gelap
+                            </>
+                        )}
+                    </button>
                     <p className="text-[10px] text-[#555570] text-center">© RTNewsSumbar — Portal Berita Terpercaya</p>
                 </div>
             </div>

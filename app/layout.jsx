@@ -1,4 +1,5 @@
 import './globals.css';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 export const metadata = {
     title: 'RTNewsSumbar — Portal Berita Terpercaya Sumatera Barat',
@@ -13,9 +14,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="id">
-            <body className="min-h-screen bg-[#0a0a0f] text-[#f0f0f5] antialiased">
-                {children}
+        // suppressHydrationWarning diperlukan karena ThemeProvider mengubah class di sisi klien
+        <html lang="id" suppressHydrationWarning>
+            <body className="min-h-screen antialiased">
+                <ThemeProvider>
+                    {children}
+                </ThemeProvider>
             </body>
         </html>
     );

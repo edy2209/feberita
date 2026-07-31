@@ -501,3 +501,118 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* =============================================================
+   LIGHT MODE — css variable overrides + element overrides
+   Aktif saat html tag memiliki class "light"
+   ============================================================= */
+
+html.light {
+  --color-bg: #f5f5f8;
+  --color-surface: #ffffff;
+  --color-surface-hover: #eeeef5;
+  --color-border: #dedee8;
+  --color-text: #131320;
+  --color-muted: #55557a;
+  --color-dim: #9090aa;
+}
+
+html.light body {
+  background-color: #f5f5f8;
+  color: #131320;
+}
+
+/* -- Backgrounds utama -- */
+html.light .bg-\[\#0a0a0f\]  { background-color: #f5f5f8 !important; }
+html.light .bg-\[\#111118\]  { background-color: #ebebf2 !important; }
+html.light .bg-\[\#16161f\]  { background-color: #ffffff !important; }
+html.light .bg-\[\#1e1e2a\]  { background-color: #eeeef5 !important; }
+
+/* -- Border -- */
+html.light .border-\[\#2a2a3a\] { border-color: #dedee8 !important; }
+
+/* -- Teks warna utama -- */
+html.light .text-\[\#f0f0f5\]  { color: #131320 !important; }
+html.light .text-\[\#c8c8e0\]  { color: #2a2a45 !important; }
+html.light .text-\[\#d0d0e0\]  { color: #2a2a45 !important; }
+html.light .text-\[\#8888aa\]  { color: #55557a !important; }
+html.light .text-\[\#555570\]  { color: #7a7a9a !important; }
+
+/* -- Warna aksen merah tetap sama di kedua mode -- */
+
+/* -- Navbar & header -- */
+html.light nav,
+html.light header {
+  background-color: #ebebf2 !important;
+  border-color: #dedee8 !important;
+}
+
+/* -- Footer -- */
+html.light footer {
+  background-color: #ebebf2 !important;
+  border-color: #dedee8 !important;
+}
+
+/* -- Card dan box -- */
+html.light .rounded-xl,
+html.light .rounded-2xl,
+html.light .rounded-lg {
+  background-color: inherit;
+}
+
+/* -- Scrollbar di light mode -- */
+html.light ::-webkit-scrollbar-track { background: #f5f5f8; }
+html.light ::-webkit-scrollbar-thumb { background: #dedee8; }
+
+/* -- Prose konten artikel di light mode -- */
+html.light .prose-news {
+  color: #2a2a45;
+}
+html.light .prose-news p {
+  color: #2a2a45;
+}
+html.light .prose-news h1,
+html.light .prose-news h2,
+html.light .prose-news h3 {
+  color: #131320;
+}
+html.light .prose-news strong {
+  color: #131320;
+}
+html.light .prose-news blockquote {
+  background: rgba(230, 57, 70, 0.04);
+  color: #55557a;
+}
+html.light .prose-news hr {
+  border-color: #dedee8;
+}
+html.light .prose-news code {
+  background: #eeeef5;
+  border-color: #dedee8;
+  color: #e63946;
+}
+html.light .prose-news img {
+  border-color: #dedee8;
+}
+
+/* -- Form dan input di light mode -- */
+html.light .form-input,
+html.light .form-select {
+  background: #f5f5f8;
+  border-color: #dedee8;
+  color: #131320;
+}
+html.light .form-input::placeholder {
+  color: #9090aa;
+}
+html.light .form-label {
+  color: #55557a;
+}
+
+/* -- Divider -- */
+html.light .divide-\[\#2a2a3a\] > * + * { border-color: #dedee8 !important; }
+
+/* Smooth transition saat ganti mode */
+html, body, * {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
+}
