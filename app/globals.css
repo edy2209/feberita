@@ -616,3 +616,33 @@ html.light .divide-\[\#2a2a3a\] > * + * { border-color: #dedee8 !important; }
 html, body, * {
   transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
 }
+
+/* -- Logo & Hamburger & Pagination overrides in light mode -- */
+html.light .logo-news-text {
+  color: #131320 !important;
+}
+
+html.light .hamburger-line {
+  background-color: #131320 !important;
+}
+
+/* Memastikan teks tombol pagination non-aktif berwarna abu-abu gelap/hitam yang kontras di light mode */
+html.light button.bg-\[\#16161f\],
+html.light a.bg-\[\#16161f\],
+html.light div.bg-\[\#16161f\] {
+  color: #2a2a45 !important;
+}
+
+/* Memastikan tombol hover pada pagination & tag tetap menggunakan warna merah aksen */
+html.light button.bg-\[\#16161f\]:hover,
+html.light a.bg-\[\#16161f\]:hover {
+  color: #e63946 !important;
+}
+
+/* Memastikan tombol dinonaktifkan (disabled) tidak terlalu kontras */
+html.light button.bg-\[\#16161f\]:disabled,
+html.light a.bg-\[\#16161f\]:disabled {
+  color: #b0b0c0 !important;
+  opacity: 0.5 !important;
+}
+

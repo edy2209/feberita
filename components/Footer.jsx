@@ -9,7 +9,7 @@ export default function Footer({ kategoris = [] }) {
                     <div>
                         <div className="flex items-baseline gap-0.5 mb-4">
                             <span className="text-2xl font-black text-[#e63946]">RT</span>
-                            <span className="text-2xl font-black text-white">News</span>
+                            <span className="text-2xl font-black text-white logo-news-text">News</span>
                             <span className="text-sm font-semibold text-[#8888aa] ml-0.5">Sumbar</span>
                         </div>
                         {/* bikin tulisan rata kiri dan kanan */}

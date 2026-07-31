@@ -73,7 +73,7 @@ export default function Navbar({ kategoris = [] }) {
                     {/* Logo */}
                     <Link href="/" className="flex items-baseline gap-0.5 shrink-0 group">
                         <span className="text-2xl font-black text-[#e63946]">RT</span>
-                        <span className="text-2xl font-black text-white">News</span>
+                        <span className="text-2xl font-black text-white logo-news-text">News</span>
                         <span className="text-sm font-semibold text-[#8888aa] ml-0.5">Sumbar</span>
                     </Link>
 
@@ -141,9 +141,9 @@ export default function Navbar({ kategoris = [] }) {
                         onClick={() => setMenuOpen(!menuOpen)}
                         aria-label={menuOpen ? 'Tutup menu' : 'Buka menu'}
                     >
-                        <span className={`absolute block w-5 h-0.5 bg-white rounded transition-all duration-300 ${menuOpen ? 'rotate-45' : '-translate-y-1.5'}`}></span>
-                        <span className={`absolute block w-5 h-0.5 bg-white rounded transition-all duration-300 ${menuOpen ? 'opacity-0 scale-x-0' : 'opacity-100'}`}></span>
-                        <span className={`absolute block w-5 h-0.5 bg-white rounded transition-all duration-300 ${menuOpen ? '-rotate-45' : 'translate-y-1.5'}`}></span>
+                        <span className={`absolute block w-5 h-0.5 bg-white hamburger-line rounded transition-all duration-300 ${menuOpen ? 'rotate-45' : '-translate-y-1.5'}`}></span>
+                        <span className={`absolute block w-5 h-0.5 bg-white hamburger-line rounded transition-all duration-300 ${menuOpen ? 'opacity-0 scale-x-0' : 'opacity-100'}`}></span>
+                        <span className={`absolute block w-5 h-0.5 bg-white hamburger-line rounded transition-all duration-300 ${menuOpen ? '-rotate-45' : 'translate-y-1.5'}`}></span>
                     </button>
                 </div>
 

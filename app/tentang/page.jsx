@@ -30,7 +30,7 @@ export default async function TentangPage() {
                 <div className="text-center mb-14">
                     <div className="flex items-baseline justify-center gap-0.5 mb-4">
                         <span className="text-4xl font-black text-[#e63946]">RT</span>
-                        <span className="text-4xl font-black text-white">News</span>
+                        <span className="text-4xl font-black text-white logo-news-text">News</span>
                         <span className="text-xl font-semibold text-[#8888aa] ml-1">Sumbar</span>
                     </div>
                     <p className="text-[#8888aa] text-base max-w-xl mx-auto leading-relaxed">
