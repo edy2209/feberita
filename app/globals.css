@@ -646,3 +646,21 @@ html.light a.bg-\[\#16161f\]:disabled {
   opacity: 0.5 !important;
 }
 
+/* Memastikan semua header halaman (h1, h2, h3, h4) yang berwarna putih menjadi hitam di Light Mode */
+html.light h1.text-white,
+html.light h2.text-white,
+html.light h3.text-white,
+html.light h4.text-white {
+  color: #131320 !important;
+}
+
+/* Judul berita di dalam Carousel Banner dan Hero Card harus tetap putih karena background gambarnya selalu gelap */
+html.light .group h2.text-white,
+html.light .group h3.text-white,
+html.light .relative h3.text-white,
+html.light .absolute h2.text-white,
+html.light .absolute h3.text-white {
+  color: #ffffff !important;
+}
+
+
